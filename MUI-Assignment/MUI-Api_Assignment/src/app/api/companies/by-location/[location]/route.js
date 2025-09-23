@@ -1,9 +1,8 @@
 import clientPromise from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
-export async function GET(request, context) {
+export async function GET(request, { params }) {
   try {
-    const params = await context.params; // ✅ await params
     const { location } = params;
 
     if (!location) {

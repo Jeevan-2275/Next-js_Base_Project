@@ -1,8 +1,9 @@
 import clientPromise from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
-export async function GET(request, { params }) {
+export async function GET(request, context) {
   try {
+    const params = await context.params; // ✅ await params
     const { skill } = params;
 
     if (!skill) {
@@ -16,7 +17,7 @@ export async function GET(request, { params }) {
     const db = client.db("workbook");
     const coll = db.collection("companies");
 
-    // case-insensitive skill search
+    // Case-insensitive skill search
     const items = await coll
       .find({
         "hiringCriteria.skills": { $regex: new RegExp(`^${skill}$`, "i") },

@@ -1,14 +1,13 @@
 import clientPromise from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
-export async function GET(request, context) {
+export async function GET(request, { params }) {
   try {
-    const params = await context.params; // ✅ await params
-    const { location } = params;
+    const { benefit } = params;
 
-    if (!location) {
+    if (!benefit) {
       return NextResponse.json(
-        { error: "Location parameter is required" },
+        { error: "Benefit parameter is required" },
         { status: 400 }
       );
     }
@@ -17,14 +16,14 @@ export async function GET(request, context) {
     const db = client.db("workbook");
     const coll = db.collection("companies");
 
-    // Case-insensitive location search
+    // Case-insensitive, substring match inside benefits array
     const items = await coll
-      .find({ location: { $regex: new RegExp(`^${location}$`, "i") } })
+      .find({ benefits: { $regex: new RegExp(benefit, "i") } })
       .toArray();
 
     return NextResponse.json({ count: items.length, items }, { status: 200 });
   } catch (err) {
-    console.error("GET /api/companies/by-location error:", err);
+    console.error("GET /api/companies/benefit error:", err);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
