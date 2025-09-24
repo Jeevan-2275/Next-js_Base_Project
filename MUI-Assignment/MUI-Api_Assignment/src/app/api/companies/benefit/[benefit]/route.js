@@ -1,9 +1,11 @@
 import clientPromise from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 
-export async function GET(request, { params }) {
+export async function GET(request) {
   try {
-    const { benefit } = params;
+    // Extract benefit from the request URL
+    const url = new URL(request.url);
+    const benefit = decodeURIComponent(url.pathname.split("/").pop());
 
     if (!benefit) {
       return NextResponse.json(
@@ -16,7 +18,7 @@ export async function GET(request, { params }) {
     const db = client.db("workbook");
     const coll = db.collection("companies");
 
-    // Case-insensitive, substring match inside benefits array
+    // Case-insensitive match inside benefits array
     const items = await coll
       .find({ benefits: { $regex: new RegExp(benefit, "i") } })
       .toArray();

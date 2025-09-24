@@ -1,31 +1,25 @@
-import { MongoClient } from "mongodb";
+// lib/mongodb.js
+import { MongoClient } from 'mongodb';
 
-if (!process.env.MONGODB_URI) {
-  throw new Error(
-    "❌ Please define the MONGODB_URI environment variable inside .env.local"
-  );
+const MONGODB_URI = "mongodb+srv://jeevankadam2275_db_user:Pass%40123@assignment0.hsl3b1g.mongodb.net/?retryWrites=true&w=majority";
+
+if (!MONGODB_URI) {
+  throw new Error('MONGODB_URI is required.');
 }
-
-const uri = process.env.MONGODB_URI;
-const options = {};
 
 let client;
 let clientPromise;
 
-if (process.env.NODE_ENV === "development") {
-  if (!global._mongoClient) {
-    client = new MongoClient(uri, options);
-    global._mongoClient = client;
+if (process.env.NODE_ENV === 'development') {
+  // preserve across module reloads
+  if (!global._mongoClientPromise) {
+    client = new MongoClient(MONGODB_URI);
     global._mongoClientPromise = client.connect();
-    console.log("🔗 Connecting to MongoDB (dev, fresh)...");
-  } else {
-    console.log("♻️ Reusing existing MongoDB connection (dev)...");
   }
   clientPromise = global._mongoClientPromise;
 } else {
-  client = new MongoClient(uri, options);
+  client = new MongoClient(MONGODB_URI);
   clientPromise = client.connect();
-  console.log("🔗 Connecting to MongoDB (production)...");
 }
 
 export default clientPromise;
